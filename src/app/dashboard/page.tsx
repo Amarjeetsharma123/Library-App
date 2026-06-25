@@ -7,6 +7,8 @@ import Link from 'next/link';
 import { BookOpen, Calendar, AlertCircle, DollarSign, BookmarkCheck, Inbox } from 'lucide-react';
 import { format } from 'date-fns';
 
+export const dynamic = 'force-dynamic';
+
 export const metadata = {
   title: 'Dashboard Overview | LibSphere',
 };

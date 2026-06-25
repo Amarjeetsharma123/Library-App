@@ -7,6 +7,8 @@ import { BookOpen, AlertCircle, HelpCircle, CheckCircle2, UserCheck, RefreshCw }
 import { format, startOfDay } from 'date-fns';
 import { revalidatePath } from 'next/cache';
 
+export const dynamic = 'force-dynamic';
+
 export const metadata = {
   title: 'Staff Portal Overview | LibSphere',
 };

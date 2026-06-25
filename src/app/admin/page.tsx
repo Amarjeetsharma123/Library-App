@@ -4,6 +4,8 @@ import StatCard from '@/components/ui/StatCard';
 import AnalyticsCharts from './AnalyticsCharts';
 import { BookOpen, Users, AlertTriangle, DollarSign } from 'lucide-react';
 
+export const dynamic = 'force-dynamic';
+
 export const metadata = {
   title: 'Admin Analytics Overview | LibSphere',
 };

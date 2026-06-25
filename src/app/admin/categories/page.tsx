@@ -1,6 +1,8 @@
 import { db } from '@/lib/db';
 import CategoryCrudClient from './CategoryCrudClient';
 
+export const dynamic = 'force-dynamic';
+
 export const metadata = {
   title: 'Manage Genres & Categories | LibSphere',
 };

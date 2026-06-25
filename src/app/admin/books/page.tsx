@@ -1,6 +1,8 @@
 import { db } from '@/lib/db';
 import BookCrudClient from './BookCrudClient';
 
+export const dynamic = 'force-dynamic';
+
 export const metadata = {
   title: 'Manage Catalog Books | LibSphere',
 };
