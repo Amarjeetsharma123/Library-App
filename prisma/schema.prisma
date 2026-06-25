@@ -1,0 +1,185 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+enum Role {
+  ADMIN
+  LIBRARIAN
+  MEMBER
+}
+
+enum BorrowStatus {
+  ISSUED
+  RETURNED
+  OVERDUE
+}
+
+enum ReservationStatus {
+  PENDING
+  FULFILLED
+  CANCELLED
+}
+
+model User {
+  id                 String               @id @default(uuid())
+  name               String
+  email              String               @unique
+  password           String
+  role               Role                 @default(MEMBER)
+  avatar             String?
+  isVerified         Boolean              @default(false)
+  isBlocked          Boolean              @default(false)
+  createdAt          DateTime             @default(now())
+  updatedAt          DateTime             @updatedAt
+  
+  borrowRecords      BorrowRecord[]
+  reservations       Reservation[]
+  fines              Fine[]
+  passwordResetTokens PasswordResetToken[]
+  verificationTokens  VerificationToken[]
+  notifications      Notification[]
+
+  @@index([email])
+}
+
+model Book {
+  id              String         @id @default(uuid())
+  title           String
+  slug            String         @unique
+  isbn            String         @unique
+  description     String?
+  coverImage      String?
+  totalCopies     Int            @default(1)
+  availableCopies Int            @default(1)
+  publishedYear   Int?
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+
+  authorId        String
+  author          Author         @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  
+  categoryId      String
+  category        Category       @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+
+  borrowRecords   BorrowRecord[]
+  reservations    Reservation[]
+
+  @@index([slug])
+  @@index([isbn])
+}
+
+model Author {
+  id    String @id @default(uuid())
+  name  String
+  bio   String?
+  books Book[]
+}
+
+model Category {
+  id          String   @id @default(uuid())
+  name        String   @unique
+  slug        String   @unique
+  description String?
+  books       Book[]
+
+  @@index([slug])
+}
+
+model BorrowRecord {
+  id          String       @id @default(uuid())
+  userId      String
+  user        User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  bookId      String
+  book        Book         @relation(fields: [bookId], references: [id], onDelete: Cascade)
+  issueDate   DateTime     @default(now())
+  dueDate     DateTime
+  returnDate  DateTime?
+  status      BorrowStatus @default(ISSUED)
+  fineAmount  Decimal      @default(0.0) @db.Decimal(10, 2)
+  
+  fines       Fine[]
+
+  @@index([userId])
+  @@index([bookId])
+}
+
+model Reservation {
+  id         String            @id @default(uuid())
+  userId     String
+  user       User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  bookId     String
+  book       Book              @relation(fields: [bookId], references: [id], onDelete: Cascade)
+  reservedAt DateTime          @default(now())
+  status     ReservationStatus @default(PENDING)
+
+  @@index([userId])
+  @@index([bookId])
+}
+
+model Fine {
+  id             String       @id @default(uuid())
+  userId         String
+  user           User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  borrowRecordId String
+  borrowRecord   BorrowRecord @relation(fields: [borrowRecordId], references: [id], onDelete: Cascade)
+  amount         Decimal      @db.Decimal(10, 2)
+  isPaid         Boolean      @default(false)
+  paidAt         DateTime?
+
+  @@index([userId])
+  @@index([borrowRecordId])
+}
+
+model PasswordResetToken {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  token     String   @unique
+  expiresAt DateTime
+
+  @@index([token])
+}
+
+model VerificationToken {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  token     String   @unique
+  expiresAt DateTime
+
+  @@index([token])
+}
+
+model Notification {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  message   String
+  isRead    Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+}
+
+model Settings {
+  id                 String @id @default(uuid())
+  loanDurationDays   Int    @default(14)
+  finePerDay         Decimal @default(1.00) @db.Decimal(10, 2)
+  maxBooksPerMember  Int    @default(5)
+  libraryName        String @default("Central Library")
+}
+
+model LoginOtp {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  otp       String
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  @@index([email])
+}
