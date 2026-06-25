@@ -5,6 +5,8 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { Tag } from 'lucide-react';
 
+export const dynamic = 'force-dynamic';
+
 interface CategoryDetailPageProps {
   params: Promise<{ slug: string }>;
 }

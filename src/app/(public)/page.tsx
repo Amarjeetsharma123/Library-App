@@ -3,6 +3,8 @@ import { db } from '@/lib/db';
 import BookCard from '@/components/ui/BookCard';
 import { BookOpen, Users, Award, ShieldCheck, ArrowRight, Star } from 'lucide-react';
 
+export const dynamic = 'force-dynamic';
+
 export const metadata = {
   title: 'Home | LibSphere Library Management System',
   description: 'Welcome to LibSphere - the modern solution for cataloging, reserving, and borrowing books.',

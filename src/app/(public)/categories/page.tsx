@@ -2,6 +2,8 @@ import { db } from '@/lib/db';
 import Link from 'next/link';
 import { Tag, BookOpen, ChevronRight } from 'lucide-react';
 
+export const dynamic = 'force-dynamic';
+
 export const metadata = {
   title: 'Genres & Categories | LibSphere',
   description: 'Browse our book collections by genres and categories.',
