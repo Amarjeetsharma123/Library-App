@@ -6,6 +6,8 @@ import { notFound } from 'next/navigation';
 import { BookOpen, Calendar, Tag, ShieldCheck, BookmarkCheck } from 'lucide-react';
 import { revalidatePath } from 'next/cache';
 
+export const dynamic = 'force-dynamic';
+
 interface BookDetailPageProps {
   params: Promise<{ slug: string }>;
 }
