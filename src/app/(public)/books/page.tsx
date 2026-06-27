@@ -135,7 +135,7 @@ export default async function BooksPage({ searchParams }: BooksPageProps) {
               <div className="flex flex-col gap-1 max-h-48 overflow-y-auto pr-1">
                 <Link
                   href={`/books${getQueryString({ category: null, page: '1' })}`}
-                  className={`text-sm px-3 py-2 rounded-lg transition-colors ${
+                  className={`block shrink-0 text-sm px-3 py-2 rounded-lg transition-colors ${
                     !categorySlug ? 'bg-primary/10 text-primary font-semibold' : 'text-muted-foreground hover:bg-accent'
                   }`}
                 >
@@ -145,7 +145,7 @@ export default async function BooksPage({ searchParams }: BooksPageProps) {
                   <Link
                     key={cat.id}
                     href={`/books${getQueryString({ category: cat.slug, page: '1' })}`}
-                    className={`text-sm px-3 py-2 rounded-lg truncate transition-colors ${
+                    className={`block shrink-0 text-sm px-3 py-2 rounded-lg truncate transition-colors ${
                       categorySlug === cat.slug ? 'bg-primary/10 text-primary font-semibold' : 'text-muted-foreground hover:bg-accent'
                     }`}
                   >
@@ -161,7 +161,7 @@ export default async function BooksPage({ searchParams }: BooksPageProps) {
               <div className="flex flex-col gap-1 max-h-48 overflow-y-auto pr-1">
                 <Link
                   href={`/books${getQueryString({ author: null, page: '1' })}`}
-                  className={`text-sm px-3 py-2 rounded-lg transition-colors ${
+                  className={`block shrink-0 text-sm px-3 py-2 rounded-lg transition-colors ${
                     !authorId ? 'bg-primary/10 text-primary font-semibold' : 'text-muted-foreground hover:bg-accent'
                   }`}
                 >
@@ -171,7 +171,7 @@ export default async function BooksPage({ searchParams }: BooksPageProps) {
                   <Link
                     key={auth.id}
                     href={`/books${getQueryString({ author: auth.id, page: '1' })}`}
-                    className={`text-sm px-3 py-2 rounded-lg truncate transition-colors ${
+                    className={`block shrink-0 text-sm px-3 py-2 rounded-lg truncate transition-colors ${
                       authorId === auth.id ? 'bg-primary/10 text-primary font-semibold' : 'text-muted-foreground hover:bg-accent'
                     }`}
                   >

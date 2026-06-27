@@ -83,7 +83,7 @@ export default function ContactPage() {
             <p className="text-sm text-muted-foreground">
               Our library staff is available to answer your questions during operational hours. Send an email or give us a call.
             </p>
-            
+
             <div className="space-y-4 pt-4">
               <div className="flex items-start gap-4">
                 <div className="p-3 bg-primary/10 text-primary rounded-xl">
@@ -91,7 +91,7 @@ export default function ContactPage() {
                 </div>
                 <div>
                   <h4 className="font-semibold text-sm">Library Location</h4>
-                  <p className="text-xs text-muted-foreground mt-1">123 Library Lane, Knowledge Hub, NY 10001</p>
+                  <p className="text-xs text-muted-foreground mt-1">Baba Vishwakarma Public Library, Mohania Road, Bhabhua, Bihar</p>
                 </div>
               </div>
 
@@ -101,7 +101,7 @@ export default function ContactPage() {
                 </div>
                 <div>
                   <h4 className="font-semibold text-sm">Phone Number</h4>
-                  <p className="text-xs text-muted-foreground mt-1">+1 (555) 019-2834</p>
+                  <p className="text-xs text-muted-foreground mt-1">+91 9334849363</p>
                 </div>
               </div>
 
@@ -152,7 +152,7 @@ export default function ContactPage() {
                     value={formData.name}
                     onChange={handleChange}
                     className="w-full px-4 py-2.5 rounded-lg border border-border bg-background focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent text-sm"
-                    placeholder="Jane Doe"
+                    placeholder="Mother India"
                   />
                   {errors.name && <p className="text-xs text-destructive">{errors.name}</p>}
                 </div>
@@ -166,7 +166,7 @@ export default function ContactPage() {
                     value={formData.email}
                     onChange={handleChange}
                     className="w-full px-4 py-2.5 rounded-lg border border-border bg-background focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent text-sm"
-                    placeholder="jane@example.com"
+                    placeholder="motherindia@library.com"
                   />
                   {errors.email && <p className="text-xs text-destructive">{errors.email}</p>}
                 </div>

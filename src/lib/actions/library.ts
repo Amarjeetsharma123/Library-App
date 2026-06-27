@@ -442,10 +442,81 @@ export async function returnBookAction(borrowRecordId: string) {
 
 // ADMIN ACTIONS
 
+// Helper to generate unique slugs for Categories and Books
+async function generateUniqueCategorySlug(name: string, excludeId?: string): Promise<string> {
+  let baseSlug = name
+    .toLowerCase()
+    .replace(/\+/g, 'plus')
+    .replace(/#/g, 'sharp')
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/(^-|-$)+/g, '');
+
+  if (!baseSlug) {
+    baseSlug = 'category';
+  }
+
+  let slug = baseSlug;
+  let counter = 1;
+
+  while (true) {
+    const existing = await db.category.findFirst({
+      where: {
+        slug,
+        ...(excludeId ? { id: { not: excludeId } } : {}),
+      },
+      select: { id: true },
+    });
+
+    if (!existing) {
+      break;
+    }
+
+    slug = `${baseSlug}-${counter}`;
+    counter++;
+  }
+
+  return slug;
+}
+
+async function generateUniqueBookSlug(title: string, excludeId?: string): Promise<string> {
+  let baseSlug = title
+    .toLowerCase()
+    .replace(/\+/g, 'plus')
+    .replace(/#/g, 'sharp')
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/(^-|-$)+/g, '');
+
+  if (!baseSlug) {
+    baseSlug = 'book';
+  }
+
+  let slug = baseSlug;
+  let counter = 1;
+
+  while (true) {
+    const existing = await db.book.findFirst({
+      where: {
+        slug,
+        ...(excludeId ? { id: { not: excludeId } } : {}),
+      },
+      select: { id: true },
+    });
+
+    if (!existing) {
+      break;
+    }
+
+    slug = `${baseSlug}-${counter}`;
+    counter++;
+  }
+
+  return slug;
+}
+
 // Categories CRUD
 export async function createCategoryAction(name: string, description?: string | null) {
   try {
-    const slug = name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '');
+    const slug = await generateUniqueCategorySlug(name);
     const category = await db.category.create({
       data: { name, slug, description },
     });
@@ -458,7 +529,7 @@ export async function createCategoryAction(name: string, description?: string | 
 
 export async function updateCategoryAction(id: string, name: string, description?: string | null) {
   try {
-    const slug = name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '');
+    const slug = await generateUniqueCategorySlug(name, id);
     const category = await db.category.update({
       where: { id },
       data: { name, slug, description },
@@ -528,7 +599,7 @@ export async function createBookAction(data: {
   publishedYear?: number;
 }) {
   try {
-    const slug = data.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '');
+    const slug = await generateUniqueBookSlug(data.title);
     
     const book = await db.book.create({
       data: {
@@ -561,7 +632,7 @@ export async function updateBookAction(id: string, data: {
   publishedYear?: number;
 }) {
   try {
-    const slug = data.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '');
+    const slug = await generateUniqueBookSlug(data.title, id);
     
     const existing = await db.book.findUnique({ where: { id } });
     if (!existing) return { success: false, message: 'Book not found.' };
