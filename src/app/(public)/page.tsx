@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import { db } from '@/lib/db';
 import BookCard from '@/components/ui/BookCard';
-import QuickStatsChart from '@/components/ui/QuickStatsChart';
+import RotatingGlobe from '@/components/ui/RotatingGlobe';
 import { ShieldCheck, Award, ArrowRight, BookOpen, Users, Star } from 'lucide-react';
 
 export const dynamic = 'force-dynamic';
@@ -68,7 +68,7 @@ export default async function HomePage() {
   const weeklyTrendMap: { [key: string]: number } = {
     'Mon': 0, 'Tue': 0, 'Wed': 0, 'Thu': 0, 'Fri': 0, 'Sat': 0, 'Sun': 0
   };
-  
+
   recentBorrows.forEach(record => {
     const dayName = daysOfWeek[record.issueDate.getDay()];
     if (weeklyTrendMap[dayName] !== undefined) {
@@ -105,7 +105,7 @@ export default async function HomePage() {
               <p className="text-lg text-slate-300 max-w-xl">
                 Browse our extensive collection of novels, technical guides, histories, and research materials. Reserve and borrow books with a click of a button.
               </p>
-              
+
               {/* Hero Search */}
               <form action="/books" method="GET" className="max-w-md flex gap-2">
                 <input
@@ -133,16 +133,10 @@ export default async function HomePage() {
                 </div>
               </div>
             </div>
-            
-            <div className="hidden lg:block lg:col-span-5 relative">
-              <div className="aspect-square bg-gradient-to-br from-indigo-600 to-indigo-800 rounded-3xl opacity-20 blur-3xl absolute inset-0"></div>
-              <QuickStatsChart
-                bookCount={bookCount}
-                activeMembers={activeMembers}
-                totalCategories={totalCategories}
-                categoryData={categoryData}
-                weeklyTrends={weeklyTrends}
-              />
+
+            <div className="lg:col-span-5 relative flex justify-center mt-10 lg:mt-0">
+              <div className="aspect-square bg-gradient-to-br from-indigo-600 to-indigo-800 rounded-full opacity-10 blur-3xl absolute inset-0"></div>
+              <RotatingGlobe />
             </div>
           </div>
         </div>
@@ -165,7 +159,7 @@ export default async function HomePage() {
         </div>
 
         {featuredBooks.length > 0 ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-6">
             {featuredBooks.map((book) => (
               <BookCard key={book.id} book={book} />
             ))}
@@ -239,16 +233,16 @@ export default async function HomePage() {
             <div className="flex items-center gap-3">
               <img
                 src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=80"
-                alt="Sarah"
+                alt="Nargish"
                 className="h-10 w-10 rounded-full object-cover"
               />
               <div>
-                <h4 className="text-sm font-semibold">Sarah Jenkins</h4>
+                <h4 className="text-sm font-semibold">Nargish</h4>
                 <span className="text-xs text-muted-foreground">University Student</span>
               </div>
             </div>
           </div>
-          
+
           <div className="bg-card border border-border p-6 rounded-xl space-y-4 shadow-sm">
             <div className="flex gap-1 text-amber-500">
               <Star className="h-4 w-4 fill-current" />
@@ -263,11 +257,11 @@ export default async function HomePage() {
             <div className="flex items-center gap-3">
               <img
                 src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=80"
-                alt="David"
+                alt="Amarjeet Sharma"
                 className="h-10 w-10 rounded-full object-cover"
               />
               <div>
-                <h4 className="text-sm font-semibold">David Vance</h4>
+                <h4 className="text-sm font-semibold">Amarjeet Sharma</h4>
                 <span className="text-xs text-muted-foreground">Librarian Staff</span>
               </div>
             </div>
@@ -286,12 +280,12 @@ export default async function HomePage() {
             </p>
             <div className="flex items-center gap-3">
               <img
-                src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=80"
-                alt="Marcus"
+                src="https://img.pikbest.com/png-images/20241009/professional-corporate-woman-icon-_10941890.png!sw800"
+                alt="Ashu Sharma"
                 className="h-10 w-10 rounded-full object-cover"
               />
               <div>
-                <h4 className="text-sm font-semibold">Marcus Brody</h4>
+                <h4 className="text-sm font-semibold">Ashu Sharma</h4>
                 <span className="text-xs text-muted-foreground">Regular Member</span>
               </div>
             </div>

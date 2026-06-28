@@ -33,14 +33,14 @@ async function main() {
   console.log('Default settings created:', settings.libraryName);
 
   // 3. Seed Users
-  const adminPassword = await bcrypt.hash('admin123', 10);
+  const adminPassword = await bcrypt.hash('abhi123', 10);
   const librarianPassword = await bcrypt.hash('lib123', 10);
   const memberPassword = await bcrypt.hash('member123', 10);
 
   const admin = await prisma.user.create({
     data: {
-      name: 'Jane Doe (Admin)',
-      email: 'admin@library.com',
+      name: 'Amarjeet Sharma (Admin)',
+      email: 'abhix1581@gmail.com',
       password: adminPassword,
       role: 'ADMIN',
       isVerified: true,
@@ -50,7 +50,7 @@ async function main() {
 
   const librarian = await prisma.user.create({
     data: {
-      name: 'John Staff (Librarian)',
+      name: 'Nargish (Librarian)',
       email: 'librarian@library.com',
       password: librarianPassword,
       role: 'LIBRARIAN',
@@ -158,7 +158,7 @@ async function main() {
 
   // 7. Seed Borrow Record (1 active borrow, 1 overdue borrow, 1 returned borrow)
   const today = new Date();
-  
+
   // Active issued book
   const activeRecord = await prisma.borrowRecord.create({
     data: {

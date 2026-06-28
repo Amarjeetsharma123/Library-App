@@ -41,6 +41,11 @@ export default function QuickStatsChart({
   ],
 }: QuickStatsChartProps) {
   const [activeTab, setActiveTab] = useState<'trends' | 'categories'>('trends');
+  const [mounted, setMounted] = useState(false);
+
+  React.useEffect(() => {
+    setMounted(true);
+  }, []);
 
   // Format category data to ensure it's not empty and looks good
   const formattedCategoryData = categoryData.length > 0
@@ -99,81 +104,83 @@ export default function QuickStatsChart({
 
         {/* Chart View */}
         <div className="h-44 w-full text-[10px] relative">
-          <ResponsiveContainer width="100%" height="100%">
-            {activeTab === 'trends' ? (
-              <AreaChart data={weeklyTrends} margin={{ top: 10, right: 5, left: -25, bottom: 0 }}>
-                <defs>
-                  <linearGradient id="colorBorrows" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#6366f1" stopOpacity={0.4} />
-                    <stop offset="95%" stopColor="#6366f1" stopOpacity={0} />
-                  </linearGradient>
-                </defs>
-                <XAxis 
-                  dataKey="name" 
-                  stroke="#94a3b8" 
-                  tickLine={false} 
-                  axisLine={false} 
-                  dy={8}
-                />
-                <YAxis 
-                  stroke="#94a3b8" 
-                  tickLine={false} 
-                  axisLine={false} 
-                  dx={-4}
-                />
-                <Tooltip
-                  contentStyle={{
-                    backgroundColor: 'rgba(15, 23, 42, 0.9)',
-                    borderColor: 'rgba(255, 255, 255, 0.1)',
-                    borderRadius: '8px',
-                    color: '#fff',
-                    backdropFilter: 'blur(8px)',
-                  }}
-                  cursor={{ stroke: '#6366f1', strokeWidth: 1, strokeDasharray: '3 3' }}
-                />
-                <Area
-                  type="monotone"
-                  dataKey="borrows"
-                  stroke="#6366f1"
-                  strokeWidth={2}
-                  fillOpacity={1}
-                  fill="url(#colorBorrows)"
-                  name="Checkouts"
-                />
-              </AreaChart>
-            ) : (
-              <BarChart data={formattedCategoryData} margin={{ top: 10, right: 5, left: -25, bottom: 0 }}>
-                <XAxis 
-                  dataKey="name" 
-                  stroke="#94a3b8" 
-                  tickLine={false} 
-                  axisLine={false} 
-                  dy={8}
-                />
-                <YAxis 
-                  stroke="#94a3b8" 
-                  tickLine={false} 
-                  axisLine={false}
-                  dx={-4}
-                />
-                <Tooltip
-                  contentStyle={{
-                    backgroundColor: 'rgba(15, 23, 42, 0.9)',
-                    borderColor: 'rgba(255, 255, 255, 0.1)',
-                    borderRadius: '8px',
-                    color: '#fff',
-                    backdropFilter: 'blur(8px)',
-                  }}
-                  cursor={{ fill: 'rgba(255, 255, 255, 0.05)' }}
-                />
-                <Bar dataKey="books" radius={[4, 4, 0, 0]} name="Books">
-                  {formattedCategoryData.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                  ))}
-                </Bar>
-              </BarChart>
-            )}
-          </ResponsiveContainer>
+          {mounted && (
+            <ResponsiveContainer width="100%" height="100%">
+              {activeTab === 'trends' ? (
+                <AreaChart data={weeklyTrends} margin={{ top: 10, right: 5, left: -25, bottom: 0 }}>
+                  <defs>
+                    <linearGradient id="colorBorrows" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="#6366f1" stopOpacity={0.4} />
+                      <stop offset="95%" stopColor="#6366f1" stopOpacity={0} />
+                    </linearGradient>
+                  </defs>
+                  <XAxis 
+                    dataKey="name" 
+                    stroke="#94a3b8" 
+                    tickLine={false} 
+                    axisLine={false} 
+                    dy={8}
+                  />
+                  <YAxis 
+                    stroke="#94a3b8" 
+                    tickLine={false} 
+                    axisLine={false} 
+                    dx={-4}
+                  />
+                  <Tooltip
+                    contentStyle={{
+                      backgroundColor: 'rgba(15, 23, 42, 0.9)',
+                      borderColor: 'rgba(255, 255, 255, 0.1)',
+                      borderRadius: '8px',
+                      color: '#fff',
+                      backdropFilter: 'blur(8px)',
+                    }}
+                    cursor={{ stroke: '#6366f1', strokeWidth: 1, strokeDasharray: '3 3' }}
+                  />
+                  <Area
+                    type="monotone"
+                    dataKey="borrows"
+                    stroke="#6366f1"
+                    strokeWidth={2}
+                    fillOpacity={1}
+                    fill="url(#colorBorrows)"
+                    name="Checkouts"
+                  />
+                </AreaChart>
+              ) : (
+                <BarChart data={formattedCategoryData} margin={{ top: 10, right: 5, left: -25, bottom: 0 }}>
+                  <XAxis 
+                    dataKey="name" 
+                    stroke="#94a3b8" 
+                    tickLine={false} 
+                    axisLine={false} 
+                    dy={8}
+                  />
+                  <YAxis 
+                    stroke="#94a3b8" 
+                    tickLine={false} 
+                    axisLine={false}
+                    dx={-4}
+                  />
+                  <Tooltip
+                    contentStyle={{
+                      backgroundColor: 'rgba(15, 23, 42, 0.9)',
+                      borderColor: 'rgba(255, 255, 255, 0.1)',
+                      borderRadius: '8px',
+                      color: '#fff',
+                      backdropFilter: 'blur(8px)',
+                    }}
+                    cursor={{ fill: 'rgba(255, 255, 255, 0.05)' }}
+                  />
+                  <Bar dataKey="books" radius={[4, 4, 0, 0]} name="Books">
+                    {formattedCategoryData.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                    ))}
+                  </Bar>
+                </BarChart>
+              )}
+            </ResponsiveContainer>
+          )}
         </div>
 
         {/* Stats Grid */}

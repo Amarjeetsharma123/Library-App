@@ -1,10 +1,11 @@
 import { auth } from '@/auth';
 import { db } from '@/lib/db';
-import { payFineAction } from '@/lib/actions/library';
 import EmptyState from '@/components/ui/EmptyState';
-import { DollarSign, CheckCircle2, ShieldAlert } from 'lucide-react';
+import RazorpayPayButton from '@/components/ui/RazorpayPayButton';
+import { DollarSign, CheckCircle2, ShieldCheck } from 'lucide-react';
 import { format } from 'date-fns';
-import { revalidatePath } from 'next/cache';
+
+export const dynamic = 'force-dynamic';
 
 export const metadata = {
   title: 'My Fines | LibSphere',
@@ -33,32 +34,57 @@ export default async function FinesPage() {
 
   const totalUnpaidAmount = unpaidFines.reduce((acc, f) => acc + Number(f.amount), 0);
 
-  const handlePay = async (formData: FormData) => {
-    'use server';
-    const id = formData.get('id') as string;
-    await payFineAction(id);
-    revalidatePath('/dashboard/fines');
-  };
-
   return (
     <div className="space-y-8">
       <div>
         <h1 className="text-3xl font-extrabold tracking-tight">My Library Fines</h1>
-        <p className="text-muted-foreground mt-1">Monitor unpaid late fees and review your transaction history.</p>
+        <p className="text-muted-foreground mt-1">Monitor unpaid late fees and pay securely via Razorpay.</p>
       </div>
 
-      {/* Unpaid Fine summary block */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="bg-card border border-border p-6 rounded-xl flex items-center gap-4 shadow-sm md:col-span-1">
+      {/* Summary Cards */}
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+        <div className="bg-card border border-border p-6 rounded-xl flex items-center gap-4 shadow-sm">
+          <div className="p-4 bg-rose-500/10 text-rose-500 rounded-2xl">
+            <DollarSign className="h-8 w-8" />
+          </div>
+          <div>
+            <span className="text-xs font-semibold text-muted-foreground uppercase">Outstanding</span>
+            <h3 className="text-2xl font-bold mt-1 text-foreground">₹{totalUnpaidAmount.toFixed(2)}</h3>
+          </div>
+        </div>
+
+        <div className="bg-card border border-border p-6 rounded-xl flex items-center gap-4 shadow-sm">
           <div className="p-4 bg-amber-500/10 text-amber-500 rounded-2xl">
             <DollarSign className="h-8 w-8" />
           </div>
           <div>
-            <span className="text-xs font-semibold text-muted-foreground uppercase">Outstanding Fines</span>
-            <h3 className="text-2xl font-bold mt-1 text-foreground">${totalUnpaidAmount.toFixed(2)}</h3>
+            <span className="text-xs font-semibold text-muted-foreground uppercase">Pending Fines</span>
+            <h3 className="text-2xl font-bold mt-1 text-foreground">{unpaidFines.length}</h3>
+          </div>
+        </div>
+
+        <div className="bg-card border border-border p-6 rounded-xl flex items-center gap-4 shadow-sm">
+          <div className="p-4 bg-emerald-500/10 text-emerald-500 rounded-2xl">
+            <CheckCircle2 className="h-8 w-8" />
+          </div>
+          <div>
+            <span className="text-xs font-semibold text-muted-foreground uppercase">Cleared Fines</span>
+            <h3 className="text-2xl font-bold mt-1 text-foreground">{paidFines.length}</h3>
           </div>
         </div>
       </div>
+
+      {/* Razorpay Trust Banner */}
+      {unpaidFines.length > 0 && (
+        <div className="flex items-center gap-3 bg-indigo-500/5 border border-indigo-500/20 rounded-xl px-5 py-3">
+          <ShieldCheck className="h-5 w-5 text-indigo-400 shrink-0" />
+          <p className="text-sm text-muted-foreground">
+            Pay securely using <span className="font-semibold text-foreground">Razorpay</span> — 
+            supports UPI, Credit/Debit Cards, Net Banking, and Wallets. 
+            Your payment is encrypted and 100% secure.
+          </p>
+        </div>
+      )}
 
       {/* Outstanding Fines Table */}
       <div className="bg-card border border-border rounded-xl p-6 shadow-sm">
@@ -71,7 +97,7 @@ export default async function FinesPage() {
                   <th className="py-3 px-4">Book Title</th>
                   <th className="py-3 px-4">Due Date</th>
                   <th className="py-3 px-4">Amount</th>
-                  <th className="py-3 px-4 text-right">Actions</th>
+                  <th className="py-3 px-4 text-right">Pay Now</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-border">
@@ -84,17 +110,14 @@ export default async function FinesPage() {
                       </div>
                     </td>
                     <td className="py-4 px-4 text-muted-foreground">{format(fine.borrowRecord.dueDate, 'PP')}</td>
-                    <td className="py-4 px-4 font-bold text-rose-500">${Number(fine.amount).toFixed(2)}</td>
+                    <td className="py-4 px-4 font-bold text-rose-500">₹{Number(fine.amount).toFixed(2)}</td>
                     <td className="py-4 px-4 text-right">
-                      <form action={handlePay}>
-                        <input type="hidden" name="id" value={fine.id} />
-                        <button
-                          type="submit"
-                          className="bg-primary text-primary-foreground hover:opacity-90 px-4 py-2 rounded-lg text-xs font-semibold shadow-md transition-colors"
-                        >
-                          Pay Now
-                        </button>
-                      </form>
+                      <RazorpayPayButton
+                        fineId={fine.id}
+                        amount={Number(fine.amount)}
+                        userName={session?.user?.name ?? 'Member'}
+                        userEmail={session?.user?.email ?? ''}
+                      />
                     </td>
                   </tr>
                 ))}
@@ -102,7 +125,10 @@ export default async function FinesPage() {
             </table>
           </div>
         ) : (
-          <p className="text-sm text-muted-foreground text-center py-6">You have no outstanding fines! Keep up the good work.</p>
+          <p className="text-sm text-muted-foreground text-center py-6 flex flex-col items-center gap-2">
+            <CheckCircle2 className="h-10 w-10 text-emerald-400" />
+            You have no outstanding fines! Keep up the good work.
+          </p>
         )}
       </div>
 
@@ -129,10 +155,11 @@ export default async function FinesPage() {
                     <td className="py-4 px-4 text-muted-foreground">
                       {fine.paidAt ? format(fine.paidAt, 'PP') : 'N/A'}
                     </td>
-                    <td className="py-4 px-4 font-semibold text-foreground">${Number(fine.amount).toFixed(2)}</td>
+                    <td className="py-4 px-4 font-semibold text-foreground">₹{Number(fine.amount).toFixed(2)}</td>
                     <td className="py-4 px-4">
-                      <span className="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold bg-emerald-500/10 text-emerald-500 border border-emerald-500/20">
-                        Paid
+                      <span className="inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-semibold bg-emerald-500/10 text-emerald-500 border border-emerald-500/20">
+                        <CheckCircle2 className="h-3 w-3" />
+                        Paid via Razorpay
                       </span>
                     </td>
                   </tr>
