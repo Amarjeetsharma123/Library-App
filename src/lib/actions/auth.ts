@@ -6,6 +6,7 @@ import bcrypt from 'bcryptjs';
 import { z } from 'zod';
 import { sendEmail } from '@/lib/email';
 import { randomUUID } from 'crypto';
+import { headers } from 'next/headers';
 
 const signUpSchema = z.object({
   name: z.string().min(2, 'Name must be at least 2 characters'),
@@ -20,17 +21,19 @@ const signUpSchema = z.object({
 
 export async function signUpAction(prevState: any, formData: FormData) {
   const name = formData.get('name') as string;
-  const email = formData.get('email') as string;
+  const emailInput = formData.get('email') as string;
   const password = formData.get('password') as string;
   const confirmPassword = formData.get('confirmPassword') as string;
   const terms = formData.get('terms') === 'on' || formData.get('terms') === 'true';
 
-  const validation = signUpSchema.safeParse({ name, email, password, confirmPassword, terms });
+  const validation = signUpSchema.safeParse({ name, email: emailInput, password, confirmPassword, terms });
 
   if (!validation.success) {
     const errors = validation.error.flatten().fieldErrors;
     return { success: false, errors };
   }
+
+  const email = emailInput.toLowerCase().trim();
 
   try {
     const existingUser = await db.user.findUnique({
@@ -72,7 +75,12 @@ export async function signUpAction(prevState: any, formData: FormData) {
       },
     });
 
-    const verifyUrl = `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/verify-email/${token}`;
+    const headersList = await headers();
+    const host = headersList.get('host') || 'localhost:3000';
+    const protocol = headersList.get('x-forwarded-proto') || 'http';
+    const baseUrl = `${protocol}://${host}`;
+
+    const verifyUrl = `${baseUrl}/verify-email/${token}`;
     await sendEmail({
       to: email,
       subject: 'Verify your Library Account',
@@ -144,11 +152,13 @@ export async function verifyEmailAction(token: string) {
 }
 
 export async function forgotPasswordAction(prevState: any, formData: FormData) {
-  const email = formData.get('email') as string;
+  const emailInput = formData.get('email') as string;
 
-  if (!email || !z.string().email().safeParse(email).success) {
+  if (!emailInput || !z.string().email().safeParse(emailInput).success) {
     return { success: false, message: 'Please enter a valid email address.' };
   }
+
+  const email = emailInput.toLowerCase().trim();
 
   try {
     const user = await db.user.findUnique({
@@ -156,10 +166,9 @@ export async function forgotPasswordAction(prevState: any, formData: FormData) {
     });
 
     if (!user) {
-      // For security, don't reveal that the user does not exist
       return {
-        success: true,
-        message: 'If an account exists with that email, we have sent a password reset link.',
+        success: false,
+        message: 'No account found with this email address.',
       };
     }
 
@@ -179,8 +188,13 @@ export async function forgotPasswordAction(prevState: any, formData: FormData) {
       },
     });
 
-    const resetUrl = `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/reset-password/${token}`;
-    await sendEmail({
+    const headersList = await headers();
+    const host = headersList.get('host') || 'localhost:3000';
+    const protocol = headersList.get('x-forwarded-proto') || 'http';
+    const baseUrl = `${protocol}://${host}`;
+
+    const resetUrl = `${baseUrl}/reset-password/${token}`;
+    const emailResult = await sendEmail({
       to: email,
       subject: 'Reset your Library Password',
       html: `
@@ -198,9 +212,16 @@ export async function forgotPasswordAction(prevState: any, formData: FormData) {
       `,
     });
 
+    if (!emailResult.success) {
+      return {
+        success: false,
+        message: 'Failed to send reset email. Please verify your SMTP settings.',
+      };
+    }
+
     return {
       success: true,
-      message: 'If an account exists with that email, we have sent a password reset link.',
+      message: 'A password reset link has been sent to your email.',
     };
   } catch (error: any) {
     console.error('Forgot password action error:', error);
@@ -259,10 +280,12 @@ export async function resetPasswordAction(prevState: any, formData: FormData) {
   }
 }
 
-export async function requestLoginOtpAction(email: string, password: string) {
-  if (!email || !password) {
+export async function requestLoginOtpAction(emailInput: string, password: string) {
+  if (!emailInput || !password) {
     return { success: false, message: 'Please enter both email and password.' };
   }
+
+  const email = emailInput.toLowerCase().trim();
 
   try {
     const user = await db.user.findUnique({
@@ -297,7 +320,12 @@ export async function requestLoginOtpAction(email: string, password: string) {
           }
         });
       }
-      const verifyUrl = `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/verify-email/${tokenRecord.token}`;
+      const headersList = await headers();
+      const host = headersList.get('host') || 'localhost:3000';
+      const protocol = headersList.get('x-forwarded-proto') || 'http';
+      const baseUrl = `${protocol}://${host}`;
+
+      const verifyUrl = `${baseUrl}/verify-email/${tokenRecord.token}`;
       await sendEmail({
         to: email,
         subject: 'Verify your Library Account',
