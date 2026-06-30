@@ -12,6 +12,26 @@ interface BookDetailPageProps {
   params: Promise<{ slug: string }>;
 }
 
+export async function generateMetadata({ params }: BookDetailPageProps) {
+  const { slug } = await params;
+  const book = await db.book.findUnique({
+    where: { slug },
+    include: { author: true },
+  });
+
+  if (!book) {
+    return {
+      title: 'Book Not Found | LibSphere',
+      description: 'The requested book is not available in our catalog.',
+    };
+  }
+
+  return {
+    title: `${book.title} | LibSphere`,
+    description: book.description || `Read details, availability status, and reserve "${book.title}" by ${book.author.name} on LibSphere.`,
+  };
+}
+
 export default async function BookDetailPage({ params }: BookDetailPageProps) {
   const { slug } = await params;
   const session = await auth();

@@ -6,6 +6,13 @@ const prisma = new PrismaClient();
 async function main() {
   console.log('Seeding started...');
 
+  // Check if seeding is already done to avoid wiping user additions
+  const userCount = await prisma.user.count();
+  if (userCount > 0) {
+    console.log('Database already has users. Skipping seed cleanup to preserve manual entries.');
+    return;
+  }
+
   // 1. Clean up existing database tables
   await prisma.notification.deleteMany({});
   await prisma.verificationToken.deleteMany({});
