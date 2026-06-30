@@ -57,6 +57,31 @@ export async function updateOverdueLoans() {
           message: `Your borrowed book "${book?.title || 'Book'}" is now overdue. Outstanding fine is $${calculatedFine.toFixed(2)}.`,
         },
       });
+
+      // Send email alert (Only once when the fine is created)
+      const userRecord = await db.user.findUnique({ where: { id: record.userId } });
+      if (userRecord && userRecord.email) {
+        await sendEmail({
+          to: userRecord.email,
+          subject: `Overdue Book Alert & Fine Notification: ${book?.title || 'Book'}`,
+          html: `
+            <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #eee; border-radius: 8px;">
+              <h2 style="color: #ef4444; margin-top: 0;">Overdue Book Alert</h2>
+              <p>Hello ${userRecord.name},</p>
+              <p>This is to inform you that the book <strong>"${book?.title || 'Book'}"</strong> issued to your account is now overdue.</p>
+              <div style="background-color: #fef2f2; padding: 15px; border-radius: 6px; margin: 20px 0; border: 1px solid #fee2e2; font-size: 14px;">
+                <strong>Book Title:</strong> ${book?.title || 'Book'}<br/>
+                <strong>Due Date:</strong> ${record.dueDate.toLocaleDateString()}<br/>
+                <strong>Late Fine Accumulated:</strong> $${calculatedFine.toFixed(2)}<br/>
+              </div>
+              <p style="color: #ef4444; font-weight: bold;">Please return the book to the library as soon as possible to prevent additional fines.</p>
+              <p style="font-size: 12px; color: #6b7280; margin-top: 20px; border-top: 1px solid #e5e7eb; padding-top: 10px;">
+                This is an automated library notice.
+              </p>
+            </div>
+          `,
+        });
+      }
     } else if (!existingFine.isPaid && Number(existingFine.amount) !== calculatedFine) {
       // Update fine amount
       await db.fine.update({

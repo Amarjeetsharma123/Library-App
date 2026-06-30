@@ -35,6 +35,17 @@ export async function sendEmail({
     return { success: true, mocked: true };
   }
 
+  // Prevent sending real emails to fake/default database emails to avoid Gmail bounce-backs
+  const normalizedTo = to.toLowerCase();
+  if (
+    normalizedTo.endsWith('@library.com') || 
+    normalizedTo.endsWith('@example.com') || 
+    (normalizedTo.includes('test') && !normalizedTo.includes('gmail.com'))
+  ) {
+    console.log(`[SMTP MOCK] Skipped sending real email to fake address: ${to}. Logged details in terminal.`);
+    return { success: true, mocked: true };
+  }
+
   try {
     const transporter = nodemailer.createTransport({
       host,
