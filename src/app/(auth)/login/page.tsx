@@ -12,6 +12,7 @@ function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const callbackUrl = searchParams.get('callbackUrl') || '/';
+  const verified = searchParams.get('verified') === 'true';
   
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -90,6 +91,12 @@ function LoginForm() {
           )}
         </p>
       </div>
+
+      {verified && (
+        <div className="flex gap-2 items-start p-3.5 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 dark:text-emerald-400 text-sm">
+          <span>Email verified successfully! You can now log in to your account.</span>
+        </div>
+      )}
 
       {errorMsg && (
         <div className="flex gap-2 items-start p-3.5 rounded-lg bg-rose-500/10 border border-rose-500/20 text-rose-600 dark:text-rose-400 text-sm">

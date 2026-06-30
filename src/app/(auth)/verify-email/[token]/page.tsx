@@ -1,6 +1,7 @@
 import { verifyEmailAction } from '@/lib/actions/auth';
 import Link from 'next/link';
 import { CheckCircle2, XCircle } from 'lucide-react';
+import { redirect } from 'next/navigation';
 
 interface VerifyEmailPageProps {
   params: Promise<{ token: string }>;
@@ -13,6 +14,10 @@ export const metadata = {
 export default async function VerifyEmailPage({ params }: VerifyEmailPageProps) {
   const { token } = await params;
   const result = await verifyEmailAction(token);
+
+  if (result.success) {
+    redirect('/login?verified=true');
+  }
 
   return (
     <div className="space-y-6 text-center">

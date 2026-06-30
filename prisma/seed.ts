@@ -57,8 +57,8 @@ async function main() {
 
   const librarian = await prisma.user.create({
     data: {
-      name: 'Nargish (Librarian)',
-      email: 'librarian@library.com',
+      name: 'Nasreen Khatun (Librarian Head)',
+      email: 'nasreen.9453@gmail.com',
       password: librarianPassword,
       role: 'LIBRARIAN',
       isVerified: true,
